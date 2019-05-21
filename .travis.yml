@@ -1,0 +1,8 @@
+language: bash
+services:
+        - docker
+branches:
+        only:
+        - gsoc2019-travis
+script:
+        - ./build-docker.sh x86
