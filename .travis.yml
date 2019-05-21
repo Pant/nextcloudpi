@@ -6,3 +6,5 @@ branches:
         - gsoc2019-travis
 script:
         - ./build-docker.sh x86
+        - ./build-docker.sh armhf
+        - ./build-docker.sh arm64
