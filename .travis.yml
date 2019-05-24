@@ -1,3 +1,4 @@
+sudo: required
 language: bash
 services:
         - docker
@@ -5,6 +6,6 @@ branches:
         only:
         - gsoc2019-travis
 script:
-        - ./build-docker.sh x86
-        - ./build-docker.sh armhf
-        - ./build-docker.sh arm64
+        - ./build-docker_test.sh x86
+        - ./build-docker_test.sh armhf
+        - ./build-docker_test.sh arm64
