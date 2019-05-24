@@ -5,6 +5,9 @@ services:
 branches:
         only:
         - gsoc2019-travis
+before_install:
+        - sudo docker run -d --privileged -p 1234:1234 --name buildkit moby/buildkit:latest --addr tcp://0.0.0.0:1234 --oci-worker-platform linux/amd64 --oci-worker-platform linux/armhf
+        - sudo docker cp buildkit:/usr/bin/buildctl /usr/bin/
 script:
         - ./build-docker_test.sh x86
         - ./build-docker_test.sh armhf
