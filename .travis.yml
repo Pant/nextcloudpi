@@ -12,6 +12,6 @@ branches:
 before_script:
         - ./.travis/main.sh #configuration script for travis machine
 script:
-        - ./build-docker_test.sh x86
-        - ./build-docker_test.sh armhf
-        - ./build-docker_test.sh arm64
+        - ./build-docker_test.sh x86 > output
+        - ./build-docker_test.sh armhf > output
+        - ./build-docker_test.sh arm64 > output
