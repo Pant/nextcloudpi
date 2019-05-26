@@ -1,15 +1,16 @@
 sudo: required
 language: generic
+addons:
+  apt:
+    packages:
+      - docker-ce #Upgrade Docker to 18.06 version that supports experimental features
 services:
         - docker
 branches:
         only:
         - gsoc2019-travis
 before_script:
-        - docker run --name buildkit --rm -d --privileged -p 1234:1234 $REPO_SLUG_ORIGIN --addr tcp://0.0.0.0:1234
-        - sudo docker cp buildkit:/usr/bin/buildctl /usr/bin/
-        - export BUILDKIT_HOST=tcp://0.0.0.0:1234
-        - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+        - ./.travis/main.sh #configuration script for travis machine
 script:
         - ./build-docker_test.sh x86
         - ./build-docker_test.sh armhf
