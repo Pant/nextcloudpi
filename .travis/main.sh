@@ -23,6 +23,7 @@ update_docker_configuration() {
   "max-concurrent-uploads": 50
 }' | sudo tee /etc/docker/daemon.json
   sudo service docker restart
+  export DOCKER_CLI_EXPERIMENTAL=enabled
 }
 
 add_packages_for_arm_architecture() {
