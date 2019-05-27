@@ -4,9 +4,6 @@ stages:
         - build_nc
         - build_ncp
 sudo: required
-cache:
-  directories:
-        - /var/lib/docker
 language: generic
 addons:
   apt:
@@ -24,11 +21,8 @@ before_script:
         - ./.travis/main.sh #configuration script for travis machine
 jobs:
   include:
-          #        - stage: configuration
-          #          script: ./.travis/main.sh #configuration script for travis machine
-
         - stage: build_debian-ncp
-          script: while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./.travis/build-docker_test.sh x86 > output
+          script: while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./.travis/build-docker_test.sh x86
         -
           script: while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./.travis/build-docker_test.sh armhf > output
         -
