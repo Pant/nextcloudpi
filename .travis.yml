@@ -1,10 +1,12 @@
 stages:
-        - configuration
         - build_debian-ncp
         - build_lamp
         - build_nc
         - build_ncp
 sudo: required
+cache:
+  directories:
+        - /var/lib/docker
 language: generic
 addons:
   apt:
@@ -15,18 +17,28 @@ services:
 branches:
   only:
         - gsoc2019-travis
-env:
-        - TEST_SUITE=".travis/build-docker_test.sh x86"
-          #        - TEST_SUITE="build-docker_test.sh armhf"
-          #        - TEST_SUITE="build-docker_test.sh arm64"
-        - TEST_SUITE="ls" #just a test
+cache:
+  directories:
+        - /var/lib/docker
+before_script:
+        - ./.travis/main.sh #configuration script for travis machine
+jobs:
+  include:
+          #        - stage: configuration
+          #          script: ./.travis/main.sh #configuration script for travis machine
 
-- &configuration
-  stage: configuration
-  env: null
-  script: ./.travis/main.sh #configuration script for travis machine
+        - stage: build_debian-ncp
+          script: while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./.travis/build-docker_test.sh x86 > output
+        -
+          script: while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./.travis/build-docker_test.sh armhf > output
+        -
+          script: while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./.travis/build-docker_test.sh arm64 > output
 
-- &build_debian-ncp
-  stage: build_debian-ncp
-  env: null
-  script: while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./${TEST_SUITE} > output
+        - stage: build_lamp
+          script: ls #Will fix later
+
+        - stage: build_nc
+          script: ls #Will fix later
+
+        - stage: build_ncp
+          script: ls #Will fix later
