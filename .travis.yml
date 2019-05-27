@@ -1,20 +1,32 @@
+stages:
+        - configuration
+        - build_debian-ncp
+        - build_lamp
+        - build_nc
+        - build_ncp
 sudo: required
 language: generic
 addons:
   apt:
     packages:
-      - docker-ce #Upgrade Docker to 18.06 version that supports experimental features
+        - docker-ce #Upgrade Docker to 18.06 version that supports experimental features
 services:
         - docker
 branches:
-        only:
+  only:
         - gsoc2019-travis
 env:
-        - TEST_SUITE="build-docker_test.sh x86"
-        - TEST_SUITE="build-docker_test.sh armhf"
-        - TEST_SUITE="build-docker_test.sh arm64"
-before_script:
-        - ./.travis/main.sh #configuration script for travis machine
-        - printenv | grep DOCKER
-script:
-        - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./${TEST_SUITE} > output
+        - TEST_SUITE=".travis/build-docker_test.sh x86"
+          #        - TEST_SUITE="build-docker_test.sh armhf"
+          #        - TEST_SUITE="build-docker_test.sh arm64"
+        - TEST_SUITE="ls" #just a test
+
+- &configuration
+  stage: configuration
+  env: null
+  script: ./.travis/main.sh #configuration script for travis machine
+
+- &build_debian-ncp
+  stage: build_debian-ncp
+  env: null
+  script: while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./${TEST_SUITE} > output
