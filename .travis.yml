@@ -8,25 +8,25 @@ language: generic
 branches:
   only:
         - gsoc2019-travis
-cache:
-  directories:
-        - /var/lib/docker
+cache: ccache
+#  directories:
+#        - /var/lib/docker
 before_script:
         - ./.travis/main.sh #configuration script for travis machine
         - export DOCKER_CLI_EXPERIMENTAL=enabled
 jobs:
   include:
         - stage: build_debian-ncp
-          script: 
-          - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
-          - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
+          script: DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
         -
-          script: DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --pull --build-arg arch=armhf --build-arg arch_qemu=arm
+          script: DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --build-arg arch=armhf --build-arg arch_qemu=arm
         -
-          script: DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-arm64v8:latest --pull --build-arg arch=arm64v8 --build-arg arch_qemu=aarch64
+          script: DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-arm64v8:latest --build-arg arch=arm64v8 --build-arg arch_qemu=aarch64
 
         - stage: build_lamp
-          script: DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64
+          script: 
+          - docker images
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
         -
           script: DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf
         -
