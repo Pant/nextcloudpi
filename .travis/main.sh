@@ -15,15 +15,20 @@ update_docker_configuration() {
   echo "INFO:
   Updating docker configuration
   "
+  #Get latest version of Docker (18.09) that supports all experimental features
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sudo sh get-docker.sh
 
-  echo '{
-  "experimental": true,
-  "storage-driver": "overlay2",
-  "max-concurrent-downloads": 50,
-  "max-concurrent-uploads": 50
-}' | sudo tee /etc/docker/daemon.json
+  #Enable experimental features
+  echo $'{\n    "experimental": true\n}' | sudo tee /etc/docker/daemon.json
+#  echo '{
+#  "experimental": true,
+#  "storage-driver": "overlay2",
+#  "max-concurrent-downloads": 50,
+#  "max-concurrent-uploads": 50
+#}' | sudo tee /etc/docker/daemon.json
   sudo service docker restart
-  export DOCKER_CLI_EXPERIMENTAL=enabled
+ # export DOCKER_CLI_EXPERIMENTAL=enabled
 }
 
 add_packages_for_arm_architecture() {
