@@ -28,7 +28,7 @@ jobs:
         - stage: build_lamp
           script: 
            - gzip -dc docker_cached/debian-ncp-amd.tar.gz | docker load
-           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
+           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64
            - docker save ownyourbits/lamp-amd64:latest | gzip -c > docker_cached/lamp-amd.tar.gz
             #        -
             #          script: DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf

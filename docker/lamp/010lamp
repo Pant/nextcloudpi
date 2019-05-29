@@ -36,6 +36,7 @@ mysqld &
 # wait for mariadb
 while :; do
   [[ -S /var/run/mysqld/mysqld.sock ]] && break
+  echo "Something's wrong here.... Mysql.sock not found"
   sleep 0.5
 done
 
