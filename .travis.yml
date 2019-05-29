@@ -1,6 +1,6 @@
 stages:
         - build_debian-ncp
-        - build_lamp
+          #       - build_lamp
         - build_nc
         - build_ncp
 sudo: required
@@ -25,15 +25,21 @@ jobs:
           #        -
           #          script: DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-arm64v8:latest --build-arg arch=arm64v8 --build-arg arch_qemu=aarch64
 
-        - stage: build_lamp
-          script: 
-           - gzip -dc docker_cached/debian-ncp-amd.tar.gz | docker load
-           - sed -i "/innodb_file_format=barracuda/a open_files_limit=100000" lamp.sh
+               #        - stage: build_lamp
+               #          script: 
+               #           - gzip -dc docker_cached/debian-ncp-amd.tar.gz | docker load
+           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
            - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
-           - sed -i '/open_files_limit=100000/d' lamp.sh
-           - docker save ownyourbits/lamp-amd64:latest | gzip -c > docker_cached/lamp-amd.tar.gz
-            #        -
-            #          script: DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf
+           - sed -i '/open_files_limit=65536/d' lamp.sh
+
+
+             ##############
+           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --pull --build-arg arch=armhf --build-arg arch_qemu=arm > output & tail -f output
+             ##############
+
+             #           - docker save ownyourbits/lamp-amd64:latest | gzip -c > docker_cached/lamp-amd.tar.gz
+             #-
+                      #script: DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf
             #        -
             #          script: DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-arm64v8:latest --build-arg arch=arm64v8
 
