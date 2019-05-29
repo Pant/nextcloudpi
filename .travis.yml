@@ -40,7 +40,7 @@ jobs:
         - stage: build_nc
           script:
            - gzip -dc docker_cached/lamp-amd.tar.gz | docker load
-           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64
+           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output & tail -f output
            - docker save ownyourbits/nextcloud-amd64:latest | gzip -c > docker_cached/nextcloud-amd.tar.gz
              #        -
              #          script: DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-armhf:latest --build-arg arch=armhf
@@ -50,7 +50,7 @@ jobs:
         - stage: build_ncp
           script:
            - gzip -dc docker_cached/nextcloud-amd.tar.gz | docker load
-           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64
+           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output & tail -f output
           #        -
           #          script: DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-armhf:latest --build-arg arch=armhf
           #        -
