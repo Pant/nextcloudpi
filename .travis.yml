@@ -24,6 +24,7 @@ jobs:
           #        -
           #          script: DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-arm64v8:latest --build-arg arch=arm64v8 --build-arg arch_qemu=aarch64
                 - docker images
+                - while :; do tail -n 3 output && sleep 1; done
                 - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & #DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
             #        -
             #          script: DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf
