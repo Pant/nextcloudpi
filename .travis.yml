@@ -10,15 +10,16 @@ branches:
         - gsoc2019-travis
 cache:
   directories:
-        - docker
+        - docker_cached
 before_script:
         - ./.travis/main.sh #configuration script for travis machine
         - export DOCKER_CLI_EXPERIMENTAL=enabled
 jobs:
   include:
         - stage: build_debian-ncp
-          script: - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
-                  - docker save ownyourbits/debian-ncp-amd64:latest | gzip > docker/debian-ncp.tar.gz
+          script:
+             - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
+             - docker save ownyourbits/debian-ncp-amd64:latest | gzip -c > docker_cached/debian-ncp.tar.gz
           #        -
           #          script: DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --build-arg arch=armhf --build-arg arch_qemu=arm
           #        -
@@ -26,9 +27,9 @@ jobs:
 
         - stage: build_lamp
           script: 
-          - gzip -dc docker/debian-ncp.tar.gz | docker load
+          - gzip -dc docker_cached/debian-ncp.tar.gz | docker load
           - docker images
-          - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
+            #- while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
             #        -
             #          script: DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf
             #        -
