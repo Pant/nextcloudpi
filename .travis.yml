@@ -3,6 +3,7 @@ stages:
         - test_build
 sudo: required
 language: generic
+dist: xenial
 branches:
   only:
         - gsoc2019-travis
