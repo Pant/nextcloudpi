@@ -10,15 +10,15 @@ before_script:
         - ./.travis/main.sh #configuration script for travis machine
         - export DOCKER_CLI_EXPERIMENTAL=enabled
         - docker version
-cache:
-  directories:
-        - docker_cached
+          #cache:
+          #  directories:
+          #        - docker_cached
 jobs:
   include:
         - stage: build_debian-ncp
           script:
                 - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
-                - docker save ownyourbits/debian-ncp-amd64:latest | gzip -c > docker_cached/debian-ncp-amd.tar.gz
+                  #                - docker save ownyourbits/debian-ncp-amd64:latest | gzip -c > docker_cached/debian-ncp-amd.tar.gz
                 - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
                 - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
                 - sed -i '/open_files_limit=65536/d' lamp.sh
