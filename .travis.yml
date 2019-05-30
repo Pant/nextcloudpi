@@ -2,8 +2,6 @@ stages:
         - build_debian-ncp
 sudo: required
 language: generic
-services:
-        docker
 branches:
   only:
         - gsoc2019-travis
