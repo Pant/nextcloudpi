@@ -1,6 +1,6 @@
 stages:
         - build_debian-ncp
-        - test
+        - test_build
 sudo: required
 language: generic
 branches:
@@ -8,10 +8,6 @@ branches:
         - gsoc2019-travis
 before_script:
         - ./.travis/main.sh #configuration script for travis machine
-        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        - sudo apt-get update
-        - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
         - export DOCKER_CLI_EXPERIMENTAL=enabled
         - docker version
 cache:
@@ -21,12 +17,15 @@ jobs:
   include:
         - stage: build_debian-ncp
           script:
-           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
-           - docker save ownyourbits/debian-ncp-amd64:latest | gzip -c > docker_cached/debian-ncp-amd.tar.gz
-           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
-           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
-           - sed -i '/open_files_limit=65536/d' lamp.sh
-           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --pull --build-arg arch=armhf --build-arg arch_qemu=arm > output & tail -f output
-        - stage: test
+                - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
+                - docker save ownyourbits/debian-ncp-amd64:latest | gzip -c > docker_cached/debian-ncp-amd.tar.gz
+                - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
+                - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
+                - sed -i '/open_files_limit=65536/d' lamp.sh
+                - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --pull --build-arg arch=armhf --build-arg arch_qemu=arm > output & tail -f output
+        - stage: test_build
           script:
-           - ls
+                - ls
+
+notifications:
+        email: false
