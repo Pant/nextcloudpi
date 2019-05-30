@@ -24,15 +24,15 @@ update_docker_configuration() {
   #Convenience script not always working
   #  curl -fsSL https://get.docker.com -o get-docker.sh
   #  sudo sh get-docker.sh
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  sudo apt-get update
-  sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+#  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+#  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+#  sudo apt-get update
+#  sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
   #Checking if Docker version is 18.09
-  docker version
-  sudo cat /etc/docker/daemon.json
-  printenv | grep DOCKER
+#  docker version
+#  sudo cat /etc/docker/daemon.json
+#  printenv | grep DOCKER
 }
 
 add_packages_for_arm_architecture() {
