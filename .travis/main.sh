@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -o errexit
+set -o errexit
 
 main() {
   update_docker_configuration
