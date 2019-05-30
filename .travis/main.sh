@@ -16,12 +16,20 @@ update_docker_configuration() {
   Updating docker configuration
   "
   #Get latest version of Docker (18.09) that supports all experimental features
-  curl -fsSL https://get.docker.com -o get-docker.sh
-  sudo sh get-docker.sh
+  #Convenience script not always working
+  #  curl -fsSL https://get.docker.com -o get-docker.sh
+  #  sudo sh get-docker.sh
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  sudo apt-get update
+  sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
   #Enable experimental features
   echo $'{\n    "experimental": true\n}' | sudo tee /etc/docker/daemon.json
   sudo service docker restart
+
+  #Checking if Docker version is 18.09
+  docker version
 }
 
 add_packages_for_arm_architecture() {
