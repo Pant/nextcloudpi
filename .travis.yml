@@ -1,13 +1,11 @@
 stages:
         - build_debian-ncp
+        - test
 sudo: required
 language: generic
 branches:
   only:
         - gsoc2019-travis
-cache:
-  directories:
-        - docker_cached
 before_script:
         - ./.travis/main.sh #configuration script for travis machine
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -16,7 +14,9 @@ before_script:
         - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
         - export DOCKER_CLI_EXPERIMENTAL=enabled
         - docker version
-        - sudo cat /etc/docker/daemon.json
+cache:
+  directories:
+        - docker_cached
 jobs:
   include:
         - stage: build_debian-ncp
@@ -27,3 +27,5 @@ jobs:
            - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-amd64:latest --build-arg arch=amd64 > output
            - sed -i '/open_files_limit=65536/d' lamp.sh
            - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --pull --build-arg arch=armhf --build-arg arch_qemu=arm > output & tail -f output
+         - stage: test
+           script: ls
