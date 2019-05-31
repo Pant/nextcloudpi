@@ -39,6 +39,8 @@ prepare_chroot_raspbian "$IMG"
 mkdir raspbian_root/tmp/ncp-build
 rsync -Aax --exclude-from .gitignore --exclude *.img --exclude *.bz2 . raspbian_root/tmp/ncp-build
 
+echo "########## Great up to here (before chroot) #######"
+
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
   sudo chroot raspbian_root /bin/bash <<'EOFCHROOT'
     set -e
@@ -87,8 +89,8 @@ clean_chroot_raspbian
 
 ## pack
  
-TAR=output/"$( basename "$IMG" .img ).tar.bz2"
-pack_image "$IMG" "$TAR"
+#TAR=output/"$( basename "$IMG" .img ).tar.bz2"
+#pack_image "$IMG" "$TAR"
 
 ## test
 
