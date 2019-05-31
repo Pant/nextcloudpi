@@ -39,8 +39,6 @@ prepare_chroot_raspbian "$IMG"
 mkdir raspbian_root/tmp/ncp-build
 rsync -Aax --exclude-from .gitignore --exclude *.img --exclude *.bz2 . raspbian_root/tmp/ncp-build
 
-echo "########## Great up to here (before chroot) #######"
-
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
   sudo chroot raspbian_root /bin/bash <<'EOFCHROOT'
     set -e
@@ -66,6 +64,9 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     mkdir -p /usr/local/etc/ncp-config.d
     cp etc/ncp-config.d/nc-nextcloud.cfg /usr/local/etc/ncp-config.d/
     install_app    lamp.sh
+########
+echo "~~~~~~~~~~~ Is lamp over? ~~~~~~~~"
+#########
     install_app    bin/ncp/CONFIG/nc-nextcloud.sh
     run_app_unsafe bin/ncp/CONFIG/nc-nextcloud.sh
     install_app    ncp.sh
