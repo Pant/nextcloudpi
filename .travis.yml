@@ -48,7 +48,7 @@ jobs:
           ### build-SD-rpi.sh
           script:
           - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
-          - sed -i "s/upload_ftp/#upload_ftp" build-SD-rpi.sh
+          - sed -i "s/upload_ftp/#upload_ftp/" build-SD-rpi.sh
           - ./build-SD-rpi.sh
           - ls /tmp
         - stage: deploy
