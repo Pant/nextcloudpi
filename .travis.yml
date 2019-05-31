@@ -50,7 +50,7 @@ jobs:
           script:
           - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
           - sed -i "s/upload_ftp/#upload_ftp/" build-SD-rpi.sh
-          - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./build-SD-rpi.sh > output & tail -f output
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & ./build-SD-rpi.sh > log_output & tail -f log_output
           - ls /tmp
 
         -
