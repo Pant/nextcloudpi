@@ -64,9 +64,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     mkdir -p /usr/local/etc/ncp-config.d
     cp etc/ncp-config.d/nc-nextcloud.cfg /usr/local/etc/ncp-config.d/
     install_app    lamp.sh
-########
-echo "~~~~~~~~~~~ Is lamp over? ~~~~~~~~"
-#########
     install_app    bin/ncp/CONFIG/nc-nextcloud.sh
     run_app_unsafe bin/ncp/CONFIG/nc-nextcloud.sh
     install_app    ncp.sh

@@ -7,9 +7,9 @@ dist: xenial
 branches:
   only:
         - gsoc2019-travis
-cache:
-  directories:
-        - docker_cached
+          #cache:
+          #  directories:
+          #        - docker_cached
 before_script:
         - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
         - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
@@ -50,7 +50,9 @@ jobs:
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-arm64v8:latest --build-arg arch=arm64v8 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-arm64v8:latest --build-arg arch=arm64v8 > output
 
-        -
+        - stage: building_images_part_2
+
+        
           ### Raspbian rpi
           script:
           - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
@@ -59,12 +61,8 @@ jobs:
           - ./build-SD-rpi.sh
           - ls /tmp
 
+            #  - stage: building_images_part_2
         -
-          ### Raspbian berryboot
-          script:
-          - ls
-        - stage: building_images_part_2
-
           ### armhf Docker images continue building
           script:
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
