@@ -16,8 +16,10 @@ jobs:
           script:
           - sed -i "s/create_torrent/#create_torrent/" build-SD-armbian.sh
           - sed -i "s/upload_ftp/#upload_ftp/" build-SD-armbian.sh
-          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building rpi image... ]====="; done &
+          - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building armbian image... ]====="; done &
           - ./build-SD-armbian.sh odroidxu4 OdroidHC2
+          - sed -i '/open_files_limit=65536/d' lamp.sh
           - ls /tmp
 
 notifications:
