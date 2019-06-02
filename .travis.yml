@@ -20,7 +20,6 @@ jobs:
 
           ### x86 Docker images
           before_script:
-          - sed -i ''
           - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
           - docker version #Check Docker 18.09 is installed
@@ -33,6 +32,8 @@ jobs:
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
+          - docker run ownyourbits/nextcloudpi-amd64:latest
+          - ./tests/activation_tests.py ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}'
 
         - 
           before_script:
