@@ -19,6 +19,11 @@ jobs:
         - stage: building_images_part_1
 
           ### x86 Docker images
+          before_script:
+          - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
+          - docker version #Check Docker 18.09 is installed
+
           script:
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & 
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
@@ -27,19 +32,34 @@ jobs:
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
+          - ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}' > IP
 
-        -
+          - docker run -d -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
+
+          - ./tests/activation_tests.py ${IP}
+
+        - 
+          before_script:
+          - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
+          - docker version #Check Docker 18.09 is installed
+
           ### armhf Docker images
           script: 
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --pull --build-arg arch=armhf --build-arg arch_qemu=arm > output
             #- docker save ownyourbits/debian-ncp-armhf:latest | gzip -c > docker_cached/debian-ncp-armhf.tar.gz
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
-          - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf > output
+          - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf > output & tail -f output
           - sed -i '/open_files_limit=65536/d' lamp.sh
             #- docker save ownyourbits/lamp-armhf:latest | gzip -c > docker_cached/lamp-armhf.tar.gz
 
         -
+          before_script:
+          - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
+          - docker version #Check Docker 18.09 is installed
+
           ### arm64v8 Docker images
           script:
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
@@ -52,6 +72,8 @@ jobs:
 
             #        - stage: building_images_part_2
         -
+          before_script:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
           ### Raspbian rpi
           script:
           - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
@@ -62,6 +84,11 @@ jobs:
 
             #  - stage: building_images_part_2
         -
+          before_script:
+          - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
+          - docker version #Check Docker 18.09 is installed
+
           ### Armbian images
           script:
           - sed -i "s/create_torrent/#create_torrent/" build-SD-armbian.sh
