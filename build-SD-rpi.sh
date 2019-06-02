@@ -39,6 +39,12 @@ prepare_chroot_raspbian "$IMG"
 mkdir raspbian_root/tmp/ncp-build
 rsync -Aax --exclude-from .gitignore --exclude *.img --exclude *.bz2 . raspbian_root/tmp/ncp-build
 
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "Time up to here: before chroot"
+ls /tmp
+ls raspbian_root
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
   sudo chroot raspbian_root /bin/bash <<'EOFCHROOT'
     set -e
