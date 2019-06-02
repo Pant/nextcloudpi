@@ -1,6 +1,6 @@
 stages:
         - building_images_part_1
-        - building_images_part_2
+          #        - building_images_part_2
 sudo: required
 language: generic
 dist: xenial
@@ -50,9 +50,8 @@ jobs:
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-arm64v8:latest --build-arg arch=arm64v8 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-arm64v8:latest --build-arg arch=arm64v8 > output
 
-        - stage: building_images_part_2
-
-        
+            #        - stage: building_images_part_2
+        -
           ### Raspbian rpi
           script:
           - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
@@ -63,13 +62,21 @@ jobs:
 
             #  - stage: building_images_part_2
         -
-          ### armhf Docker images continue building
+          ### Armbian images
           script:
+          - sed -i "s/create_torrent/#create_torrent/" build-SD-armbian.sh
+          - sed -i "s/upload_ftp/#upload_ftp/" build-SD-armbian.sh
+            #- sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building armbian image... ]====="; done &
+          - ./build-SD-armbian.sh odroidxu4 OdroidHC2
+            #- sed -i '/open_files_limit=65536/d' lamp.sh
+           ### armhf Docker images continue building
+#          script:
                   #          - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
                   #          - gzip -dc docker_cached/debian-ncp-armhf.tar.gz | docker load
                   #          - gzip -dc docker_cached/lamp-armhf.tar.gz | docker load
                   #          - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-armhf:latest --build-arg arch=armhf > output
                   #          - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-armhf:latest --build-arg arch=armhf > output
-          - ls
+                  #- ls
 notifications:
         email: false
