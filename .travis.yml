@@ -39,16 +39,18 @@ jobs:
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 443:443 -p 4443:4443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
-          - sudo apt-get install python3-pip
-          - sudo python3 -m pip install selenium
-          - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+            #          - sudo apt-get install python3-pip
+            #          - sudo python3 -m pip install selenium
+            #          - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
             #          - mkdir geckodriver
-          - tar -xvzf geckodriver*
-          - chmod +x geckodriver
-          - export PATH=$PATH:$PWD
+            #          - tar -xvzf geckodriver*
+            #          - chmod +x geckodriver
+            #          - export PATH=$PATH:$PWD
+          - ./.travis/configure_webtesting.sh
           - ./tests/activation_tests.py ${IP}
-          - sleep 3
+          - sleep 5
           - ./tests/nextcloud_tests.py ${IP}
+          - sleep 5
           _ ./tests/system_tests.py ncp@${IP}
 notifications:
         email: false
