@@ -47,6 +47,7 @@ jobs:
           - chmod +x geckodriver
           - export PATH=$PATH:$PWD
           - ./tests/activation_tests.py ${IP}
+          - ./tests/nextcloud_tests.py ${IP}
 
 notifications:
         email: false
