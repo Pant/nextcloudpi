@@ -48,9 +48,7 @@ jobs:
             #          - export PATH=$PATH:$PWD
           - ./.travis/configure_webtesting.sh
           - ./tests/activation_tests.py ${IP}
-          - sleep 5
           - ./tests/nextcloud_tests.py ${IP}
-          - sleep 5
           _ ./tests/system_tests.py ncp@${IP}
 notifications:
         email: false
