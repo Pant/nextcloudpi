@@ -32,9 +32,9 @@ jobs:
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
           - ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}' > IP
-
+          - cat IP
           - docker run -d -p 443:443 -p 4443:4443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
-          - pip install selenium
+          - sudo pip install selenium
           - ./tests/activation_tests.py ${IP}
 
 notifications:
