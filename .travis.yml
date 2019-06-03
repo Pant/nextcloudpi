@@ -12,7 +12,7 @@ branches:
 addons:
   firefox: latest
 install:
-        - sh -e /etc/init.d/xvfb start
+        - sudo sh -e /etc/init.d/xvfb start
 before_script:
         - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
         - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
