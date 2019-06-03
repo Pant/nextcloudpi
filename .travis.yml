@@ -11,8 +11,13 @@ branches:
           #        - docker_cached
 addons:
   firefox: latest
+  apt:
+    packages:
+        - xvfb
 install:
-        - sudo sh -e /etc/init.d/xvfb start
+        - "export DISPLAY=:99.0"
+        - "sh -e /etc/init.d/xvfb start"
+        - sleep 3 # give xvfb some time to start
 before_script:
         - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
         - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
