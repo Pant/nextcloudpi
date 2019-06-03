@@ -11,14 +11,6 @@ branches:
           #        - docker_cached
 addons:
   firefox: latest
-  #  apt:
-  #    packages:
-  #        - xvfb
-  #services:
-  #        - xvfb
-  #install:
-        #        - "export DISPLAY=:99.0"
-        #        - sleep 3 # give xvfb some time to start
 before_script:
         - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
         - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
@@ -28,7 +20,6 @@ jobs:
         - stage: building_images_part_1
           script:
           - export MOZ_HEADLESS=1
-            # - export DISPLAY=:99.0
           - export SELENIUM_FIREFOX_DRIVER=/home/travis/build/lotcz/zSample/geckodriver
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & 
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
@@ -49,6 +40,6 @@ jobs:
           - ./.travis/configure_webtesting.sh
           - ./tests/activation_tests.py ${IP}
           - ./tests/nextcloud_tests.py ${IP}
-          _ ./tests/system_tests.py ncp@${IP}
+          - ./tests/system_tests.py ncp@${IP}
 notifications:
         email: false
