@@ -11,10 +11,6 @@ branches:
           #        - docker_cached
 addons:
   firefox: latest
-env:
-          - MOZ_HEADLESS=1
-          - DISPLAY=:99.0
-          - SELENIUM_FIREFOX_DRIVER=/home/travis/build/lotcz/zSample/geckodriver
 install:
           - wget https://selenium/download/url -O selenium-server.jar
           - wget https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux32.tar.gz
@@ -31,10 +27,6 @@ jobs:
           - MOZ_HEADLESS=1
           - DISPLAY=:99.0
           - SELENIUM_FIREFOX_DRIVER=/home/travis/build/lotcz/zSample/geckodriver
-          before_install:
-          - wget https://selenium/download/url -O selenium-server.jar
-          - wget https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-linux32.tar.gz
-          - tar -xzf geckodriver-v0.21.0-linux32.tar.gz
           script:
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & 
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
