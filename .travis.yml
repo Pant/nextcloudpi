@@ -18,7 +18,6 @@ services:
         - xvfb
 install:
         - "export DISPLAY=:99.0"
-          #       - "sudo sh -e /etc/init.d/xvfb start"
         - sleep 3 # give xvfb some time to start
 before_script:
         - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
@@ -42,11 +41,12 @@ jobs:
           - docker run -d -p 443:443 -p 4443:4443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
           - sudo apt-get install python3-pip
           - sudo python3 -m pip install selenium
-          - wget https://github.com/mozilla/geckodriver/releases/download/v0.11.1/geckodriver-v0.11.1-linux64.tar.gz
-          - mkdir geckodriver
-          - tar -xzf geckodriver-v0.11.1-linux64.tar.gz -C geckodriver
-          - export PATH=$PATH:$PWD/geckodriver
-          - sudo ./tests/activation_tests.py ${IP}
+          - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+            #          - mkdir geckodriver
+          - tar -xvzf geckodriver*
+          - chmod +x geckodriver
+          - export PATH=$PATH:$PWD
+          - ./tests/activation_tests.py ${IP}
 
 notifications:
         email: false
