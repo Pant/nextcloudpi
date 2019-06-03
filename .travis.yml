@@ -47,7 +47,8 @@ jobs:
           - chmod +x geckodriver
           - export PATH=$PATH:$PWD
           - ./tests/activation_tests.py ${IP}
-          - ./tests/nextcloud_tests.py ${IP} > output & tail -f output
-
+          - sleep 3
+          - ./tests/nextcloud_tests.py ${IP}
+          _ ./tests/system_tests.py ncp@${IP}
 notifications:
         email: false
