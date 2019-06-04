@@ -28,6 +28,7 @@ jobs:
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
           - docker save ownyourbits/nextcloudpi-amd64:latest | gzip -c > docker_cached/ncp-amd64.tar.gz
+          - docker save ownyourbits/nextcloud-amd64:latest | gzip -c > docker_cached/ncp-amd64.tar.gz
 
 
         - stage: testing
@@ -56,6 +57,7 @@ jobs:
           - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
           - docker tag ownyourbits/nextcloudpi-amd64:latest $DOCKER_USERNAME/nextcloudpi-amd64:latest
           - docker push $DOCKER_USERNAME/nextcloudpi-amd64:latest
+          - 
         - stage: release
 
 notifications:
