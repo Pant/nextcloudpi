@@ -1,26 +1,22 @@
 stages:
         - building_images_part_1
-          #        - building_images_part_2
+        - building_images_part_2
 sudo: required
 language: generic
 dist: xenial
 branches:
   only:
         - gsoc2019-travis
-          #cache:
-          #  directories:
-          #        - docker_cached
-before_script:
-        - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
-        - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
-        - docker version #Check Docker 18.09 is installed
+cache:
+  directories:
+        - docker_cached
 jobs:
   include:
         - stage: building_images_part_1
 
           ### x86 Docker images
-          before_script:
-          - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
+          install:
+          - ./.travis/configure_docker.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
           - docker version #Check Docker 18.09 is installed
 
@@ -32,15 +28,11 @@ jobs:
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
-          - ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}' > IP
-
-          - docker run -d -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
-
-          - ./tests/activation_tests.py ${IP}
+          - docker save ownyourbits/nextcloudpi-amd64:latest | gzip -c > docker_cached/ncp-amd64.tar.gz
 
         - 
-          before_script:
-          - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
+          install:
+          - ./.travis/configure_docker.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
           - docker version #Check Docker 18.09 is installed
 
@@ -56,7 +48,8 @@ jobs:
 
         -
           before_script:
-          - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
+          - 
+          - ./.travis/configure_docker.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
           - docker version #Check Docker 18.09 is installed
 

@@ -100,7 +100,7 @@ def test_nextcloud(IP):
     test.new("settings config")
     try:
         wait = WebDriverWait(driver, 30)
-     #   wait.until(EC.visibility_of(driver.find_element_by_class_name("icon-checkmark-white")))
+        wait.until(EC.visibility_of(driver.find_element_by_class_name("icon-checkmark-white")))
         test.check(True)
     except:
         test.check(False)

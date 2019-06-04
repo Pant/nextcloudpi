@@ -49,7 +49,7 @@ jobs:
             #- ./.travis/configure_webtesting.sh
           script:
           - ./tests/activation_tests.py ${IP}
-          - sleep 5
+          - sleep 60
           - ./tests/nextcloud_tests.py ${IP}
           - sleep 5
           - ./tests/system_tests.py ncp@${IP}
