@@ -12,4 +12,7 @@ echo $'{
   "storage-driver": "overlay2"
 }' | sudo tee /etc/docker/daemon.json
 sudo service docker restart
+<<<<<<< HEAD
 
+=======
+>>>>>>> gsoc2019-travis
