@@ -1,14 +1,17 @@
 stages:
         - building_images_part_1
+        - testing
 sudo: required
 language: generic
 dist: xenial
 branches:
   only:
         - gsoc2019-travis
-          #cache:
-          #  directories:
-          #        - docker_cached
+cache:
+  directories:
+        - docker_cached
+addons:
+  firefox: latest
 before_script:
         - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
         - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
@@ -16,13 +19,6 @@ before_script:
 jobs:
   include:
         - stage: building_images_part_1
-
-          ### x86 Docker images
-          before_script:
-          - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
-          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
-          - docker version #Check Docker 18.09 is installed
-
           script:
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & 
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
@@ -31,11 +27,32 @@ jobs:
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
-          - ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}' > IP
+          - docker save ownyourbits/nextcloudpi-amd64:latest | gzip -c > docker_cached/ncp-amd64.tar.gz
 
+
+        - stage: testing
+          install:
+          - ./.travis/configure_docker.sh
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features 
+          - gzip -dc docker_cached/ncp-amd64.tar.gz | docker load
+          - export MOZ_HEADLESS=1
+          - export SELENIUM_FIREFOX_DRIVER=/home/travis/build/lotcz/zSample/geckodriver
+          - sudo apt-get install python3-pip
+          - sudo python3 -m pip install selenium
+          - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
+          - tar -xvzf geckodriver*
+          - chmod +x geckodriver
+          - export PATH=$PATH:$PWD
+          before_script:
+          - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 443:443 -p 4443:4443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
-          - pip install selenium
+            #- ./.travis/configure_webtesting.sh
+          script:
           - ./tests/activation_tests.py ${IP}
+          - sleep 60
+          - ./tests/nextcloud_tests.py ${IP}
+          - sleep 5
+          - ./tests/system_tests.py ncp@${IP}
 
 notifications:
         email: false
