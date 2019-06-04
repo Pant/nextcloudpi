@@ -32,10 +32,9 @@ jobs:
           - docker save ownyourbits/nextcloudpi-amd64:latest | gzip -c > docker_cached/ncp-amd64.tar.gz
 
         - 
-
           ### armhf Docker images
           install:
-          - ./.travis/arm_arch.sh #installing packages for arm architecture
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
           - ./.travis/configure_docker.sh #upgrading docker and installing packages for arm architecture
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
           - docker version #Check Docker 18.09 is installed
@@ -45,15 +44,14 @@ jobs:
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --pull --build-arg arch=armhf --build-arg arch_qemu=arm > output
             #- docker save ownyourbits/debian-ncp-armhf:latest | gzip -c > docker_cached/debian-ncp-armhf.tar.gz
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
-          - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf > output & tail -f output
+          - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf > output
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - docker save ownyourbits/lamp-armhf:latest | gzip -c > docker_cached/lamp-armhf.tar.gz
 
         -
-
           ### arm64v8 Docker images
           install:
-          - ./.travis/arm_arch.sh #installing packages for arm architecture
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
           - ./.travis/configure_docker.sh #upgrading docker and installing packages for arm architecture
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
           - docker version #Check Docker 18.09 is installed
@@ -70,9 +68,9 @@ jobs:
           
           ### armhf Docker images
           install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
           - ./.travis/configure_docker.sh
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
-          - ./.travis/arm_arch.sh
 
           before_script:
           - gzip -dc docker_cached/lamp-armhf.tar.gz | docker load
@@ -85,9 +83,9 @@ jobs:
 
           ### armh64v8 Docker images
           install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
           - ./.travis/configure_docker.sh
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
-          - ./.travis/arm_arch.sh
   
           before_script:
           - gzip -dc docker_cached/lamp-arm64v8.tar.gz | docker load
@@ -155,8 +153,8 @@ jobs:
         -
           ### armhf Docker images
           install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
           - ./.travis/configure_docker.sh
-          - ./.travis/arm_arch.sh
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features      
           - export MOZ_HEADLESS=1
           - export SELENIUM_FIREFOX_DRIVER=/home/travis/build/lotcz/zSample/geckodriver
@@ -182,8 +180,8 @@ jobs:
         -
           ### arm64v8 Docker images
           install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
           - ./.travis/configure_docker.sh
-          - ./.travis/arm_arch.sh
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features      
           - export MOZ_HEADLESS=1
           - export SELENIUM_FIREFOX_DRIVER=/home/travis/build/lotcz/zSample/geckodriver

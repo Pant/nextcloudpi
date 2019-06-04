@@ -54,5 +54,7 @@ jobs:
           - sleep 5
           - ./tests/system_tests.py ncp@${IP}
 
+        - stage: release
+
 notifications:
         email: false
