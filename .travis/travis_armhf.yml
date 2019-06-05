@@ -1,5 +1,6 @@
 stages:
-        - building
+        - building_part1
+        - building_part2
         - testing
         - release
 sudo: required
@@ -15,7 +16,7 @@ addons:
   firefox: latest
 jobs:
   include:
-        - stage: building
+        - stage: building_part1
 
           install:
           - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
@@ -32,10 +33,26 @@ jobs:
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-armhf:latest --build-arg arch=armhf > output
           - docker save ownyourbits/debian-ncp-armhf:latest | gzip -c > docker_cached/debian-ncp-armhf.tar.gz
           - docker save ownyourbits/lamp-armhf:latest | gzip -c > docker_cached/lamp-armhf.tar.gz
+
+        - stage: building_part2
+
+          install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+          - ./.travis/configure_docker.sh #configuration script for travis machine
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
+
+          before_script:
+          - gzip -dc docker_cached/lamp-armhf.tar.gz | docker load
+ 
+          script:
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & 
+          - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-armhf:latest --build-arg arch=armhf > output
+          - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-armhf:latest --build-arg arch=armhf > output
           - docker save ownyourbits/nextcloud-armhf:latest | gzip -c > docker_cached/nextcloud-armhf.tar.gz
           - docker save ownyourbits/nextcloudpi-armhf:latest | gzip -c > docker_cached/nextcloudpi-armhf.tar.gz
 
         - stage: testing
+
           install:
           - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
           - ./.travis/configure_docker.sh
@@ -48,9 +65,11 @@ jobs:
           - tar -xvzf geckodriver*
           - chmod +x geckodriver
           - export PATH=$PATH:$PWD
+
           before_script:
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 443:443 -p 4443:4443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-armhf:latest ${IP}
+
           script:
           - ./tests/activation_tests.py ${IP}
           - sleep 60
@@ -59,6 +78,7 @@ jobs:
           - ./tests/system_tests.py ncp@${IP}
  
         - stage: release
+
           install:
           - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
           - ./.travis/configure_docker.sh
@@ -86,8 +106,7 @@ jobs:
           - docker push $DOCKER_USERNAME/nextcloud-armhf:"${version}"
           - docker push $DOCKER_USERNAME/nextcloudpi-armhf:"${version}"
 
-          - docker manifest create --amend $DOCKER_USERNAME/nextcloudpi \
-             $DOCKER_USERNAME/nextcloudpi-armhf 
+          - docker manifest create --amend $DOCKER_USERNAME/nextcloudpi $DOCKER_USERNAME/nextcloudpi-armhf 
              #             $DOCKER_USERNAME/nextcloudpi-armhf \
              #             $DOCKER_USERNAME/nextcloudpi-arm64
 
