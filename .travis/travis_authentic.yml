@@ -1,7 +1,7 @@
 stages:
-        - building_images_part_1
-        - building_images_part_2
-        - testing_images
+        - building_part1
+        - building_part2
+        - testing
 sudo: required
 language: generic
 dist: xenial
@@ -13,7 +13,7 @@ cache:
         - docker_cached
 jobs:
   include:
-        - stage: building_images_part_1
+        - stage: building_part1
 
           ### x86 Docker images
           install:
@@ -69,7 +69,7 @@ jobs:
           - docker save ownyourbits/debian-ncp-arm64v8:latest | gzip -c > docker_cached/debian-ncp-arm64v8.tar.gz
           - docker save ownyourbits/lamp-arm64v8:latest | gzip -c > docker_cached/lamp-arm64v8.tar.gz
 
-        - stage: building_images_part_2
+        - stage: building_part2
           
           ### armhf Docker images
           install:
@@ -131,7 +131,7 @@ jobs:
             #          - ./build-SD-armbian.sh odroidxu4 OdroidHC2
             #- sed -i '/open_files_limit=65536/d' lamp.sh
 
-        - stage: testing_images
+        - stage: testing
 
           ### x86 Docker images
           install:
@@ -247,6 +247,7 @@ jobs:
           - docker manifest annotate $DOCKER_USERNAME/nextcloudpi $DOCKER_USERNAME/nextcloudpi-armhf --os linux --arch arm
           - docker manifest annotate $DOCKER_USERNAME/nextcloudpi $DOCKER_USERNAME/nextcloudpu-arm64 --os linux --arch arm64v8
           - docker manifest push -p $DOCKER_USERNAME/nextcloudpi
+
 
 notifications:
   email: false
