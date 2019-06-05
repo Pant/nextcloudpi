@@ -13,9 +13,9 @@ if [[ "$arch" != "x86" ]]; then
 
   sed -i "s/x86/${arch}/g" travis_${arch}.yml
   sed -i "22s,#,," travis_${arch}.yml
-  sed -i "40s,#,," travis_${arch}.yml
-  sed -i "57s,#,," travis_${arch}.yml
-  sed -i "83s,#,," travis_${arch}.yml
+  sed -i "38s,#,," travis_${arch}.yml
+  sed -i "55s,#,," travis_${arch}.yml
+  sed -i "81s,#,," travis_${arch}.yml
 fi
 
 echo "Your produced travis file is: $PWD/travis_${arch}.yml"

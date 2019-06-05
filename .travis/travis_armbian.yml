@@ -1,0 +1,28 @@
+stages:
+        - building_part1
+sudo: required
+language: generic
+dist: xenial
+branches:
+  only:
+        - gsoc2019-travis
+cache:
+  directories:
+        - docker_cached
+jobs:
+  include:
+        - stage: building_part1
+
+          install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+
+          script:
+          - sed -i "s/create_torrent/#create_torrent/" build-SD-armbian.sh
+          - sed -i "s/upload_ftp/#upload_ftp/" build-SD-armbian.sh
+          - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building armbian image... ]====="; done &
+          - ./build-SD-armbian.sh odroidxu4 OdroidHC2
+          - sed -i '/open_files_limit=65536/d' lamp.sh
+
+notifications:
+  email: false

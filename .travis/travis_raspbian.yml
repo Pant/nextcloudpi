@@ -1,0 +1,27 @@
+stages:
+        - building_part1
+sudo: required
+language: generic
+dist: xenial
+branches:
+  only:
+        - gsoc2019-travis
+cache:
+  directories:
+        - docker_cached
+jobs:
+  include:
+        - stage: building_part1
+
+        install:
+        - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+
+        script:
+        - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
+        - sed -i "s/upload_ftp/#upload_ftp/" build-SD-rpi.sh
+        - while sleep 9m; do echo "=====[ $SECONDS seconds, still building rpi image... ]====="; done &
+        - ./build-SD-rpi.sh
+        - ls /tmp
+
+notifications:
+  email: false
