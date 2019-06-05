@@ -29,7 +29,10 @@ jobs:
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
-          - docker save ownyourbits/nextcloudpi-amd64:latest | gzip -c > docker_cached/ncp-amd64.tar.gz
+          - docker save ownyourbits/debian-ncp-amd64:latest | gzip -c > docker_cached/debian-ncp-amd64.tar.gz
+          - docker save ownyourbits/lamp-amd64:latest | gzip -c > docker_cached/lamp-amd64.tar.gz
+          - docker save ownyourbits/nextcloud-amd64:latest | gzip -c > docker_cached/nextcloud-amd64.tar.gz
+          - docker save ownyourbits/nextcloudpi-amd64:latest | gzip -c > docker_cached/nextcloudpi-amd64.tar.gz
 
         - 
           ### armhf Docker images
@@ -46,6 +49,7 @@ jobs:
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf > output
           - sed -i '/open_files_limit=65536/d' lamp.sh
+          - docker save ownyourbits/debian-nxp-armhf:latest | gzip -c > docker_cached/debian-ncp-armhf.tar.gz
           - docker save ownyourbits/lamp-armhf:latest | gzip -c > docker_cached/lamp-armhf.tar.gz
 
         -
@@ -62,6 +66,7 @@ jobs:
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-arm64v8:latest --build-arg arch=arm64v8 > output
           - sed -i '/open_files_limit=65536/d' lamp.sh
+          - docker save ownyourbits/debian-ncp-arm64v8:latest | gzip -c > docker_cached/debian-ncp-arm64v8.tar.gz
           - docker save ownyourbits/lamp-arm64v8:latest | gzip -c > docker_cached/lamp-arm64v8.tar.gz
 
         - stage: building_images_part_2
@@ -79,7 +84,8 @@ jobs:
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-armhf:latest --build-arg arch=armhf > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-armhf:latest --build-arg arch=armhf > output
-          - docker save ownyourbits/nextcloudpi-armhf:latest | gzip -c > docker_cached/ncp-armhf.tar.gz
+          - docker save ownyourbits/nextcloud-armhf:latest | gzip -c > docker_cached/nextcloud-armhf.tar.gz
+          - docker save ownyourbits/nextcloudpi-armhf:latest | gzip -c > docker_cached/nextcloudpi-armhf.tar.gz
 
         -
           ### armh64v8 Docker images
@@ -95,7 +101,8 @@ jobs:
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-arm64v8:latest --build-arg arch=arm64v8 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-arm64v8:latest --build-arg arch=arm64v8 > output
-          - docker save ownyourbits/nextcloudpi-arm64v8:latest | gzip -c > docker_cached/ncp-arm64v8.tar.gz
+          - docker save ownyourbits/nextcloud-arm64v8:latest | gzip -c > docker_cached/nextcloud-arm64v8.tar.gz
+          - docker save ownyourbits/nextcloudpi-arm64v8:latest | gzip -c > docker_cached/nextcloudpi-arm64v8.tar.gz
 
             #        - 
             #          install:
@@ -131,7 +138,6 @@ jobs:
           - ./.travis/configure_docker.sh
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features      
           - export MOZ_HEADLESS=1
-          - export SELENIUM_FIREFOX_DRIVER=/home/travis/build/lotcz/zSample/geckodriver
           - sudo apt-get install python3-pip
           - sudo python3 -m pip install selenium
           - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
@@ -140,7 +146,7 @@ jobs:
           - export PATH=$PATH:$PWD
             
           before_script:
-          - gzip -dc docker_cached/ncp-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloudpi-amd64.tar.gz | docker load
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 4443:4443 -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
 
@@ -158,7 +164,6 @@ jobs:
           - ./.travis/configure_docker.sh
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features      
           - export MOZ_HEADLESS=1
-          - export SELENIUM_FIREFOX_DRIVER=/home/travis/build/lotcz/zSample/geckodriver
           - sudo apt-get install python3-pip
           - sudo python3 -m pip install selenium
           - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
@@ -167,7 +172,7 @@ jobs:
           - export PATH=$PATH:$PWD
             
           before_script:
-          - gzip -dc docker_cached/ncp-armhf.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloudpi-armhf.tar.gz | docker load
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 4443:4443 -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-armhf:latest ${IP}
 
@@ -185,7 +190,6 @@ jobs:
           - ./.travis/configure_docker.sh
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features      
           - export MOZ_HEADLESS=1
-          - export SELENIUM_FIREFOX_DRIVER=/home/travis/build/lotcz/zSample/geckodriver
           - sudo apt-get install python3-pip
           - sudo python3 -m pip install selenium
           - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
@@ -194,7 +198,7 @@ jobs:
           - export PATH=$PATH:$PWD
             
           before_script:
-          - gzip -dc docker_cached/ncp-arm64v8.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloudpi-arm64v8.tar.gz | docker load
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 4443:4443 -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-arm64v8:latest ${IP}
 
@@ -205,5 +209,44 @@ jobs:
           - sleep 5
           - ./tests/system_tests.py ncp@${IP} 
           
+        - stage: release
+
+          ### x86 Docker images
+          install:
+          - ./.travis/configure_docker.sh
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features 
+ 
+          before_script:
+          - gzip -dc docker_cached/debian-ncp-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/lamp-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloud-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloudpi-amd64.tar.gz | docker load
+          - version=$(git describe --tags --always)
+          - version=${version%-*-*}
+          - echo ${version}
+
+          script:
+          - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+          - docker tag ownyourbits/debian-ncp-amd64:latest $DOCKER_USERNAME/debian-ncp-x86:"${version}"
+          - docker tag ownyourbits/lamp-amd64:latest $DOCKER_USERNAME/lamp-x86:"${version}"
+          - docker tag ownyourbits/nextcloud-amd64:latest $DOCKER_USERNAME/nextcloud-x86:"${version}"
+          - docker tag ownyourbits/nextcloudpi-amd64:latest $DOCKER_USERNAME/nextcloudpi-x86:"${version}"
+
+          - docker push $DOCKER_USERNAME/debian-ncp-x86:"${version}"
+          - docker push $DOCKER_USERNAME/lamp-x86:"${version}"
+          - docker push $DOCKER_USERNAME/nextcloud-x86:"${version}"
+          - docker push $DOCKER_USERNAME/nextcloudpi-x86:"${version}"
+
+          - docker manifest create --amend $DOCKER_USERNAME/nextcloudpi \
+             $DOCKER_USERNAME/nextcloudpi-x86 \
+             $DOCKER_USERNAME/nextcloudpi-armhf \ 
+             $DOCKER_USERNAME/nextcloudpi-arm64
+
+          - docker manifest annotate $DOCKER_USERNAME/nextcloudpi $DOCKER_USERNAME/nextcloudpi-x86 --os linux --arch amd64
+          - docker manifest annotate $DOCKER_USERNAME/nextcloudpi $DOCKER_USERNAME/nextcloudpi-armhf --os linux --arch arm
+          - docker manifest annotate $DOCKER_USERNAME/nextcloudpi $DOCKER_USERNAME/nextcloudpu-arm64 --os linux --arch arm64v8
+          - docker manifest push -p $DOCKER_USERNAME/nextcloudpi
+
 notifications:
   email: false

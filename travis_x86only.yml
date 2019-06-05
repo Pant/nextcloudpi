@@ -27,15 +27,16 @@ jobs:
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
-          - docker save ownyourbits/nextcloudpi-amd64:latest | gzip -c > docker_cached/ncp-amd64.tar.gz
-          - docker save ownyourbits/nextcloud-amd64:latest | gzip -c > docker_cached/ncp-amd64.tar.gz
-
+          - docker save ownyourbits/debian-ncp-amd64:latest | gzip -c > docker_cached/debian-ncp-amd64.tar.gz
+          - docker save ownyourbits/lamp-amd64:latest | gzip -c > docker_cached/lamp-amd64.tar.gz
+          - docker save ownyourbits/nextcloud-amd64:latest | gzip -c > docker_cached/nextcloud-amd64.tar.gz
+          - docker save ownyourbits/nextcloudpi-amd64:latest | gzip -c > docker_cached/nextcloudpi-amd64.tar.gz
 
         - stage: testing
           install:
           - ./.travis/configure_docker.sh
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features 
-          - gzip -dc docker_cached/ncp-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloudpi-amd64.tar.gz | docker load
           - export MOZ_HEADLESS=1
           - sudo apt-get install python3-pip
           - sudo python3 -m pip install selenium
@@ -46,19 +47,49 @@ jobs:
           before_script:
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 443:443 -p 4443:4443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
-            #- ./.travis/configure_webtesting.sh
           script:
           - ./tests/activation_tests.py ${IP}
           - sleep 60
           - ./tests/nextcloud_tests.py ${IP}
           - sleep 5
           - ./tests/system_tests.py ncp@${IP}
-
-          - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-          - docker tag ownyourbits/nextcloudpi-amd64:latest $DOCKER_USERNAME/nextcloudpi-amd64:latest
-          - docker push $DOCKER_USERNAME/nextcloudpi-amd64:latest
-          - 
+ 
         - stage: release
+          install:
+          - ./.travis/configure_docker.sh
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
+
+          before_script:
+          - gzip -dc docker_cached/debian-ncp-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/lamp-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloud-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloudpi-amd64.tar.gz | docker load
+          - version=$(git describe --tags --always)
+          - version=${version%-*-*}
+          - echo ${version}
+
+          script:
+          - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+          - docker tag ownyourbits/debian-ncp-amd64:latest $DOCKER_USERNAME/debian-ncp-x86:"${version}"
+          - docker tag ownyourbits/lamp-amd64:latest $DOCKER_USERNAME/lamp-x86:"${version}"
+          - docker tag ownyourbits/nextcloud-amd64:latest $DOCKER_USERNAME/nextcloud-x86:"${version}"
+          - docker tag ownyourbits/nextcloudpi-amd64:latest $DOCKER_USERNAME/nextcloudpi-x86:"${version}"
+
+          - docker push $DOCKER_USERNAME/debian-ncp-x86:"${version}"
+          - docker push $DOCKER_USERNAME/lamp-x86:"${version}"
+          - docker push $DOCKER_USERNAME/nextcloud-x86:"${version}"
+          - docker push $DOCKER_USERNAME/nextcloudpi-x86:"${version}"
+
+          - docker manifest create --amend $DOCKER_USERNAME/nextcloudpi \
+             $DOCKER_USERNAME/nextcloudpi-x86 \
+             $DOCKER_USERNAME/nextcloudpi-armhf \
+             $DOCKER_USERNAME/nextcloudpi-arm64
+
+          - docker manifest annotate $DOCKER_USERNAME/nextcloudpi $DOCKER_USERNAME/nextcloudpi-x86 --os linux --arch amd64
+          - docker manifest annotate $DOCKER_USERNAME/nextcloudpi $DOCKER_USERNAME/nextcloudpi-armhf --os linux --arch arm
+          - docker manifest annotate $DOCKER_USERNAME/nextcloudpi $DOCKER_USERNAME/nextcloudpu-arm64 --os linux --arch arm64v8
+          - docker manifest push -p $DOCKER_USERNAME/nextcloudpi
 
 notifications:
         email: false
