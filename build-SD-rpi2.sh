@@ -23,11 +23,6 @@ pgrep -f qemu-arm-static &>/dev/null && { echo "qemu-arm-static already running.
 
 IMG=tmp/"$IMG"
 
-prepare_dirs                   # tmp cache output
-download_raspbian "$IMG"
-resize_image      "$IMG" "$SIZE"
-update_boot_uuid  "$IMG"       # PARTUUID has changed after resize
-
 # make sure we don't accidentally disable first run wizard
 rm -f ncp-web/{wizard.cfg,ncp-web.cfg}
 
@@ -38,6 +33,12 @@ prepare_chroot_raspbian "$IMG"
 
 mkdir raspbian_root/tmp/ncp-build
 rsync -Aax --exclude-from .gitignore --exclude *.img --exclude *.bz2 . raspbian_root/tmp/ncp-build
+
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "Time up to here: before chroot"
+ls /tmp
+ls raspbian_root
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
   sudo chroot raspbian_root /bin/bash <<'EOFCHROOT'
@@ -87,8 +88,8 @@ clean_chroot_raspbian
 
 ## pack
  
-TAR=output/"$( basename "$IMG" .img ).tar.bz2"
-pack_image "$IMG" "$TAR"
+#TAR=output/"$( basename "$IMG" .img ).tar.bz2"
+#pack_image "$IMG" "$TAR"
 
 ## test
 

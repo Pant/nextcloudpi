@@ -1,5 +1,6 @@
 stages:
         - building_part1
+        - building_part2
 sudo: required
 language: generic
 dist: xenial
@@ -8,20 +9,29 @@ branches:
         - gsoc2019-travis
 cache:
   directories:
-        - docker_cached
+        - img_part
 jobs:
   include:
         - stage: building_part1
 
-        install:
-        - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+          install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+         
+          script:
+          - ./build-SD-rpi1.sh
+          - gzip -c /tmp/ > img_part/tmp_rpi.tar.gz
 
-        script:
-        - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
-        - sed -i "s/upload_ftp/#upload_ftp/" build-SD-rpi.sh
-        - while sleep 9m; do echo "=====[ $SECONDS seconds, still building rpi image... ]====="; done &
-        - ./build-SD-rpi.sh
-        - ls /tmp
+        - stage: building_part2
+          install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+          - gzip -dc img_part/tmp_rpi.tar.gz
+          - ls
+
+          script:
+          - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi2.sh
+          - sed -i "s/upload_ftp/#upload_ftp/" build-SD-rpi2.sh
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building rpi image... ]====="; done &
+          - ./build-SD-rpi2.sh
 
 notifications:
   email: false
