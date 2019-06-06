@@ -19,7 +19,7 @@ jobs:
          
           script:
           - ./build-SD-rpi1.sh
-          - gzip -c /tmp/ > img_part/tmp_rpi.tar.gz
+          - gzip -c /tmp/* > img_part/tmp_rpi.tar.gz
 
         - stage: building_part2
           install:
