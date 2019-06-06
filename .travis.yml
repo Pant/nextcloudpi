@@ -1,7 +1,6 @@
 stages:
         - building_part1
         - building_part2
-        - testing
 sudo: required
 language: generic
 dist: xenial
@@ -104,39 +103,7 @@ jobs:
           - docker save ownyourbits/nextcloud-arm64v8:latest | gzip -c > docker_cached/nextcloud-arm64v8.tar.gz
           - docker save ownyourbits/nextcloudpi-arm64v8:latest | gzip -c > docker_cached/nextcloudpi-arm64v8.tar.gz
 
-            #        - 
-            #          install:
-            #          - ./.travis/arm_arch.sh #installing packages for arm architecture
-          ### Raspbian rpi
-          #          script:
-          #          - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
-          #          - sed -i "s/upload_ftp/#upload_ftp/" build-SD-rpi.sh
-          #          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building rpi image... ]====="; done &
-          #          - ./build-SD-rpi.sh
-          #          - ls /tmp
-
-            #  - stage: building_images_part_2
-            #        -
-            #          before_script:
-            #          - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
-            #          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
-            #          - docker version #Check Docker 18.09 is installed
-
-          ### Armbian images
-          #          script:
-          #          - sed -i "s/create_torrent/#create_torrent/" build-SD-armbian.sh
-          #          - sed -i "s/upload_ftp/#upload_ftp/" build-SD-armbian.sh
-            #- sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
-            #          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building armbian image... ]====="; done &
-            #          - ./build-SD-armbian.sh odroidxu4 OdroidHC2
-            #- sed -i '/open_files_limit=65536/d' lamp.sh
-
-        - stage: testing
-
-          ### x86 Docker images
-          install:
-          - ./.travis/configure_docker.sh
-          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features      
+          after_success:
           - export MOZ_HEADLESS=1
           - sudo apt-get install python3-pip
           - sudo python3 -m pip install selenium
@@ -145,60 +112,6 @@ jobs:
           - chmod +x geckodriver
           - export PATH=$PATH:$PWD
             
-          before_script:
-          - gzip -dc docker_cached/nextcloudpi-amd64.tar.gz | docker load
-          - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
-          - docker run -d -p 4443:4443 -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
-
-          script:
-          - ./tests/activation_tests.py ${IP}
-          - sleep 60
-          - ./tests/nextcloud_tests.py ${IP}
-          - sleep 5
-          - ./tests/system_tests.py ncp@${IP}
-
-        -
-          ### armhf Docker images
-          install:
-          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
-          - ./.travis/configure_docker.sh
-          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features      
-          - export MOZ_HEADLESS=1
-          - sudo apt-get install python3-pip
-          - sudo python3 -m pip install selenium
-          - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
-          - tar -xvzf geckodriver*
-          - chmod +x geckodriver
-          - export PATH=$PATH:$PWD
-            
-          before_script:
-          - gzip -dc docker_cached/nextcloudpi-armhf.tar.gz | docker load
-          - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
-          - docker run -d -p 4443:4443 -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-armhf:latest ${IP}
-
-          script:
-          - ./tests/activation_tests.py ${IP}
-          - sleep 60
-          - ./tests/nextcloud_tests.py ${IP}
-          - sleep 5
-          - ./tests/system_tests.py ncp@${IP} 
-
-        -
-          ### arm64 Docker images
-          install:
-          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
-          - ./.travis/configure_docker.sh
-          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features      
-          - export MOZ_HEADLESS=1
-          - sudo apt-get install python3-pip
-          - sudo python3 -m pip install selenium
-          - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
-          - tar -xvzf geckodriver*
-          - chmod +x geckodriver
-          - export PATH=$PATH:$PWD
-            
-          before_script:
-          - gzip -dc docker_cached/nextcloudpi-arm64v8.tar.gz | docker load
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 4443:4443 -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-arm64v8:latest ${IP}
 
