@@ -47,7 +47,7 @@ jobs:
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --pull --build-arg arch=armhf --build-arg arch_qemu=arm > output
             #- docker save ownyourbits/debian-ncp-armhf:latest | gzip -c > docker_cached/debian-ncp-armhf.tar.gz
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
-          - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf > output & tail -f output
+          - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf > output
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - docker save ownyourbits/debian-nxp-armhf:latest | gzip -c > docker_cached/debian-ncp-armhf.tar.gz
           - docker save ownyourbits/lamp-armhf:latest | gzip -c > docker_cached/lamp-armhf.tar.gz
@@ -64,7 +64,7 @@ jobs:
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-arm64v8:latest --build-arg arch=arm64v8 --build-arg arch_qemu=aarch64 > output
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
-          - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-arm64v8:latest --build-arg arch=arm64v8 > output & tail -f output
+          - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-arm64v8:latest --build-arg arch=arm64v8 > output
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - docker save ownyourbits/debian-ncp-arm64v8:latest | gzip -c > docker_cached/debian-ncp-arm64v8.tar.gz
           - docker save ownyourbits/lamp-arm64v8:latest | gzip -c > docker_cached/lamp-arm64v8.tar.gz
