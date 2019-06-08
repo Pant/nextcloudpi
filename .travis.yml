@@ -29,10 +29,10 @@ jobs:
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
-          - docker save ownyourbits/debian-ncp-amd64:latest | gzip -c > docker_cached/debian-ncp-amd64.tar.gz
+          - docker save -o  docker_cached/debian-ncp-amd64.tar ownyourbits/debian-ncp-amd64:latest 
           - docker save ownyourbits/lamp-amd64:latest | gzip -c > docker_cached/lamp-amd64.tar.gz
           - docker save ownyourbits/nextcloud-amd64:latest | gzip -c > docker_cached/nextcloud-amd64.tar.gz
-          - docker save ownyourbits/nextcloudpi-amd64:latest | gzip -c > docker_cached/nextcloudpi-amd64.tar.gz
+          - docker save -o docker_cached/nextcloudpi-amd64.tar ownyourbits/nextcloudpi-amd64:latest
 
         - 
           ### armhf Docker images
@@ -147,13 +147,13 @@ jobs:
           - export PATH=$PATH:$PWD
             
           before_script:
-          - gzip -dc docker_cached/nextcloudpi-amd64.tar.gz | docker load
+          - docker load -i docker_cached/nextcloudpi-amd64.tar
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 4443:4443 -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
 
           script:
           - ./tests/activation_tests.py ${IP}
-          - sleep 60
+          - sleep 120
           - ./tests/nextcloud_tests.py ${IP}
           - sleep 5
           - ./tests/system_tests.py ncp@${IP}
@@ -179,7 +179,7 @@ jobs:
 
           script:
           - ./tests/activation_tests.py ${IP}
-          - sleep 60
+          - sleep 120
           - ./tests/nextcloud_tests.py ${IP}
           - sleep 5
           - ./tests/system_tests.py ncp@${IP} 
@@ -205,7 +205,7 @@ jobs:
 
           script:
           - ./tests/activation_tests.py ${IP}
-          - sleep 60
+          - sleep 120
           - ./tests/nextcloud_tests.py ${IP}
           - sleep 5
           - ./tests/system_tests.py ncp@${IP} 
