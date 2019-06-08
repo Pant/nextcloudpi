@@ -45,7 +45,6 @@ jobs:
           script: 
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --pull --build-arg arch=armhf --build-arg arch_qemu=arm > output
-            #- docker save ownyourbits/debian-ncp-armhf:latest | gzip -c > docker_cached/debian-ncp-armhf.tar.gz
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf > output
           - sed -i '/open_files_limit=65536/d' lamp.sh

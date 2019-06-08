@@ -202,7 +202,6 @@ function install_app()
   source "$script"
   echo "Installing $ncp_app"
   install
-  echo $?
 }
 
 function cleanup_script()
