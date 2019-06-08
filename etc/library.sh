@@ -201,7 +201,8 @@ function install_app()
   unset install
   source "$script"
   echo "Installing $ncp_app"
-  (install)
+  install
+  echo $?
 }
 
 function cleanup_script()
