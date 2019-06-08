@@ -159,15 +159,16 @@ max_heap_table_size= 64M
 EOF
 
 
-  # launch mariadb if not already running
+  echo "~~~~launch mariadb if not already running~~~"
   if ! pgrep -c mysqld &>/dev/null; then
     mysqld & 
   fi
-
-  # wait for mariadb
+  
+  echo "~~~wait for mariadb~~"
   while :; do
     [[ -S /run/mysqld/mysqld.sock ]] && break
     sleep 0.5
+    echo "~~~While sleeping~~~"
   done
 
   cd /tmp
@@ -181,6 +182,7 @@ y
 y
 y
 EOF
+exit 0
 }
 
 configure() { :; }
