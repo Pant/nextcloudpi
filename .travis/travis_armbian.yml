@@ -1,17 +1,14 @@
 stages:
-        - building_part1
+        - building
 sudo: required
 language: generic
 dist: xenial
 branches:
   only:
         - gsoc2019-travis
-cache:
-  directories:
-        - docker_cached
 jobs:
   include:
-        - stage: building_part1
+        - stage: building
 
           install:
           - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
