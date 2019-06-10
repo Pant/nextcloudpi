@@ -76,32 +76,32 @@ jobs:
           - docker save --output docker_cached/nextcloud-arm64v8.tar ownyourbits/nextcloud-arm64v8:latest
           - docker save --output docker_cached/nextcloudpi-arm64v8.tar ownyourbits/nextcloudpi-arm64v8:latest
 
-            #        - 
-            #          install:
-            #          - ./.travis/arm_arch.sh #installing packages for arm architecture
-          ### Raspbian rpi
-          #          script:
-          #          - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
-          #          - sed -i "s/upload_ftp/#upload_ftp/" build-SD-rpi.sh
-          #          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building rpi image... ]====="; done &
-          #          - ./build-SD-rpi.sh
-          #          - ls /tmp
+        - 
+          ### Raspbian images
+          install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+          
+          script:
+          - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
+          - sed -i "s/upload_ftp/#upload_ftp/" build-SD-rpi.sh
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building rpi image... ]====="; done &
+          - ./build-SD-rpi.sh
+          - ls /tmp
 
-            #  - stage: building_images_part_2
-            #        -
-            #          before_script:
-            #          - ./.travis/main.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
-            #          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
-            #          - docker version #Check Docker 18.09 is installed
-
+        -
           ### Armbian images
-          #          script:
-          #          - sed -i "s/create_torrent/#create_torrent/" build-SD-armbian.sh
-          #          - sed -i "s/upload_ftp/#upload_ftp/" build-SD-armbian.sh
-            #- sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
-            #          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building armbian image... ]====="; done &
-            #          - ./build-SD-armbian.sh odroidxu4 OdroidHC2
-            #- sed -i '/open_files_limit=65536/d' lamp.sh
+          before_script:
+          - ./.travis/configure_docker.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
+          - docker version #Check Docker 18.09 is installed
+
+          script:
+          - sed -i "s/create_torrent/#create_torrent/" build-SD-armbian.sh
+          - sed -i "s/upload_ftp/#upload_ftp/" build-SD-armbian.sh
+          - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, still building armbian image... ]====="; done &
+          - ./build-SD-armbian.sh odroidxu4 OdroidHC2
+          - sed -i '/open_files_limit=65536/d' lamp.sh
 
         - stage: testing
 

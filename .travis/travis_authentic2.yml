@@ -50,7 +50,7 @@ jobs:
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-armhf:latest --build-arg arch=armhf > file_output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-armhf:latest --build-arg arch=armhf > file_output
-          - docker save --output docker_cached/debian-ncp-armhf.tar ownyourbits/debian-nxp-armhf:latest
+          - docker save --output docker_cached/debian-ncp-armhf.tar ownyourbits/debian-ncp-armhf:latest
           - docker save --output docker_cached/lamp-armhf.tar ownyourbits/lamp-armhf:latest
           - docker save --output docker_cached/nextcloud-armhf.tar ownyourbits/nextcloud-armhf:latest
           - docker save --output docker_cached/nextcloudpi-armhf.tar ownyourbits/nextcloudpi-armhf:latest
@@ -76,10 +76,11 @@ jobs:
           - docker save --output docker_cached/nextcloud-arm64v8.tar ownyourbits/nextcloud-arm64v8:latest
           - docker save --output docker_cached/nextcloudpi-arm64v8.tar ownyourbits/nextcloudpi-arm64v8:latest
 
-      - 
-         install:
-         - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
-          ### Raspbian rpi
+        - 
+          ### Raspbian images
+          install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+          
           script:
           - sed -i "s/create_torrent/#create_torrent/" build-SD-rpi.sh
           - sed -i "s/upload_ftp/#upload_ftp/" build-SD-rpi.sh
@@ -87,13 +88,13 @@ jobs:
           - ./build-SD-rpi.sh
           - ls /tmp
 
-      -
+        -
+          ### Armbian images
           before_script:
           - ./.travis/configure_docker.sh #configuration script for travis machine - upgrading docker and installing packages for arm architecture
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
           - docker version #Check Docker 18.09 is installed
 
-          ### Armbian images
           script:
           - sed -i "s/create_torrent/#create_torrent/" build-SD-armbian.sh
           - sed -i "s/upload_ftp/#upload_ftp/" build-SD-armbian.sh
