@@ -69,7 +69,7 @@ jobs:
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-arm64v8:latest --build-arg arch=arm64v8 > file_output
           - sed -i '/open_files_limit=65536/d' lamp.sh
-	  - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-arm64v8:latest --build-arg arch=arm64v8 > file_output
+          - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-arm64v8:latest --build-arg arch=arm64v8 > file_output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-arm64v8:latest --build-arg arch=arm64v8 > file_output
           - docker save --output docker_cached/debian-ncp-arm64v8.tar ownyourbits/debian-ncp-arm64v8:latest
           - docker save --output docker_cached/lamp-arm64v8.tar ownyourbits/lamp-arm64v8:latest
