@@ -1,7 +1,7 @@
 stages:
-        - building
+        - building_part1
+        - building_part2
         - testing
-        - release
 sudo: required
 language: generic
 dist: xenial
@@ -13,7 +13,7 @@ cache:
         - docker_cached
 jobs:
   include:
-        - stage: building
+        - stage: building_part1
 
           ### x86 Docker images
           install:
@@ -29,10 +29,10 @@ jobs:
           - sed -i '/open_files_limit=65536/d' lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-amd64:latest --build-arg arch=amd64 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-amd64:latest --build-arg arch=amd64 > output
-          - docker save ownyourbits/debian-ncp-amd64:latest > docker_cached/debian-ncp-amd64.tar
-          - docker save ownyourbits/lamp-amd64:latest > docker_cached/lamp-amd64.tar
-          - docker save ownyourbits/nextcloud-amd64:latest > docker_cached/nextcloud-amd64.tar
-          - docker save ownyourbits/nextcloudpi-amd64:latest > docker_cached/nextcloudpi-amd64.tar
+          - docker save ownyourbits/debian-ncp-amd64:latest | gzip -c > docker_cached/debian-ncp-amd64.tar.gz
+          - docker save ownyourbits/lamp-amd64:latest | gzip -c > docker_cached/lamp-amd64.tar.gz
+          - docker save ownyourbits/nextcloud-amd64:latest | gzip -c > docker_cached/nextcloud-amd64.tar.gz
+          - docker save ownyourbits/nextcloudpi-amd64:latest | gzip -c > docker_cached/nextcloudpi-amd64.tar.gz
 
         - 
           ### armhf Docker images
@@ -48,12 +48,8 @@ jobs:
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-armhf:latest --build-arg arch=armhf > output
           - sed -i '/open_files_limit=65536/d' lamp.sh
-          - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-armhf:latest --build-arg arch=armhf > output
-          - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-armhf:latest --build-arg arch=armhf > output
-          - docker save ownyourbits/debian-nxp-armhf:latest > docker_cached/debian-ncp-armhf.tar
-          - docker save ownyourbits/lamp-armhf:latest > docker_cached/lamp-armhf.tar
- 	  - docker save ownyourbits/nextcloud-armhf:latest > docker_cached/nextcloud-armhf.tar
-          - docker save ownyourbits/nextcloudpi-armhf:latest > docker_cached/nextcloudpi-armhf.tar
+          - docker save ownyourbits/debian-nxp-armhf:latest | gzip -c > docker_cached/debian-ncp-armhf.tar.gz
+          - docker save ownyourbits/lamp-armhf:latest | gzip -c > docker_cached/lamp-armhf.tar.gz
 
         -
           ### arm64 Docker images
@@ -69,12 +65,43 @@ jobs:
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
           - DOCKER_BUILDKIT=1 docker build . -f docker/lamp/Dockerfile -t ownyourbits/lamp-arm64v8:latest --build-arg arch=arm64v8 > output
           - sed -i '/open_files_limit=65536/d' lamp.sh
-	  - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-arm64v8:latest --build-arg arch=arm64v8 > output
+          - docker save ownyourbits/debian-ncp-arm64v8:latest | gzip -c > docker_cached/debian-ncp-arm64v8.tar.gz
+          - docker save ownyourbits/lamp-arm64v8:latest | gzip -c > docker_cached/lamp-arm64v8.tar.gz
+
+        - stage: building_part2
+          
+          ### armhf Docker images
+          install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+          - ./.travis/configure_docker.sh
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
+
+          before_script:
+          - gzip -dc docker_cached/lamp-armhf.tar.gz | docker load
+
+          script:
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
+          - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-armhf:latest --build-arg arch=armhf > output
+          - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-armhf:latest --build-arg arch=armhf > output
+          - docker save ownyourbits/nextcloud-armhf:latest | gzip -c > docker_cached/nextcloud-armhf.tar.gz
+          - docker save ownyourbits/nextcloudpi-armhf:latest | gzip -c > docker_cached/nextcloudpi-armhf.tar.gz
+
+        -
+          ### armh64 Docker images
+          install:
+          - sudo apt-get --yes --no-install-recommends install binfmt-support qemu-user-static
+          - ./.travis/configure_docker.sh
+          - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features
+  
+          before_script:
+          - gzip -dc docker_cached/lamp-arm64v8.tar.gz | docker load
+
+          script:
+          - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
+          - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloud/Dockerfile -t ownyourbits/nextcloud-arm64v8:latest --build-arg arch=arm64v8 > output
           - DOCKER_BUILDKIT=1 docker build . -f docker/nextcloudpi/Dockerfile -t ownyourbits/nextcloudpi-arm64v8:latest --build-arg arch=arm64v8 > output
-          - docker save ownyourbits/debian-ncp-arm64v8:latest > docker_cached/debian-ncp-arm64v8.tar
-          - docker save ownyourbits/lamp-arm64v8:latest > docker_cached/lamp-arm64v8.tar
-	  - docker save ownyourbits/nextcloud-arm64v8:latest > docker_cached/nextcloud-arm64v8.tar
-          - docker save ownyourbits/nextcloudpi-arm64v8:latest > docker_cached/nextcloudpi-arm64v8.tar
+          - docker save ownyourbits/nextcloud-arm64v8:latest | gzip -c > docker_cached/nextcloud-arm64v8.tar.gz
+          - docker save ownyourbits/nextcloudpi-arm64v8:latest | gzip -c > docker_cached/nextcloudpi-arm64v8.tar.gz
 
             #        - 
             #          install:
@@ -118,7 +145,7 @@ jobs:
           - export PATH=$PATH:$PWD
             
           before_script:
-          - docker load --input docker_cached/nextcloudpi-amd64.tar
+          - gzip -dc docker_cached/nextcloudpi-amd64.tar.gz | docker load
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 4443:4443 -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-amd64:latest ${IP}
 
@@ -144,7 +171,7 @@ jobs:
           - export PATH=$PATH:$PWD
             
           before_script:
-          - docker load --input docker_cached/nextcloudpi-armhf.tar
+          - gzip -dc docker_cached/nextcloudpi-armhf.tar.gz | docker load
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 4443:4443 -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-armhf:latest ${IP}
 
@@ -170,7 +197,7 @@ jobs:
           - export PATH=$PATH:$PWD
             
           before_script:
-          - docker load --input docker_cached/nextcloudpi-arm64v8.tar
+          - gzip -dc docker_cached/nextcloudpi-arm64v8.tar.gz | docker load
           - IP=$(ip route get 8.8.8.8 | awk -F"src " 'NR==1{split($2,a," ");print a[1]}')
           - docker run -d -p 4443:4443 -p 443:443 -p 80:80 -v ncdata:/data --name nextcloudpi ownyourbits/nextcloudpi-arm64v8:latest ${IP}
 
@@ -188,20 +215,20 @@ jobs:
           - export DOCKER_CLI_EXPERIMENTAL=enabled #enable experimental features 
  
           before_script:
-          - docker load --input docker_cached/debian-ncp-amd64.tar
-          - docker load --input docker_cached/lamp-amd64.tar
-          - docker load --input docker_cached/nextcloud-amd64.tar
-          - docker load --input docker_cached/nextcloudpi-amd64.tar
+          - gzip -dc docker_cached/debian-ncp-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/lamp-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloud-amd64.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloudpi-amd64.tar.gz | docker load
 
-          - docker load --input docker_cached/debian-ncp-armhf.tar
-          - docker load --input docker_cached/lamp-armhf.tar
-          - docker load --input docker_cached/nextcloud-armhf.tar
-          - docker load --input docker_cached/nextcloudpi-armhf.tar
+          - gzip -dc docker_cached/debian-ncp-armhf.tar.gz | docker load
+          - gzip -dc docker_cached/lamp-armhf.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloud-armhf.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloudpi-armhf.tar.gz | docker load
 
-          - docker load --input docker_cached/debian-ncp-arm64v8.tar
-          - docker load --input docker_cached/lamp-arm64v8.tar
-          - docker load --input docker_cached/nextcloud-arm64v8.tar
-          - docker load --input docker_cached/nextcloudpi-arm64v8.tar
+          - gzip -dc docker_cached/debian-ncp-arm64v8.tar.gz | docker load
+          - gzip -dc docker_cached/lamp-arm64v8.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloud-arm64v8.tar.gz | docker load
+          - gzip -dc docker_cached/nextcloudpi-arm64v8.tar.gz | docker load
 
           - version=$(git describe --tags --always)
           - version=${version%-*-*}
