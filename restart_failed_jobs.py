@@ -23,7 +23,7 @@ subprocess.run("docker run --name travis-cli --rm -t -d -v $(pwd):/project --ent
 gh_token = os.environ['GITHUB_TOKEN']
 
 # Enter the running container with docker exec and login to travis
-command_docker = "docker exec travis-cli travis login --org --github-token "
+command_docker = "docker exec travis-cli travis login --pro --github-token "
 command_docker += gh_token
 subprocess.run(command_docker, shell=True)
 
