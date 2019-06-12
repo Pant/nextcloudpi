@@ -1,5 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import commands, re
+import subprocess, re
 
-builds = commands.getoutput('travis show')
+jobs = subprocess.check_output("travis show")
+#jobs = commands.getoutput('travis show')
+#jobs = map(lambda x: x.split(), jobs.split('\n'))
+print (jobs)
