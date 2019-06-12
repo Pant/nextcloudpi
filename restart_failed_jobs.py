@@ -23,7 +23,7 @@ subprocess.run("docker run --name travis-cli --rm -t -d -v $(pwd):/project --ent
 gh_token = os.environ['GITHUB_TOKEN']
 
 # Enter the running container with docker exec and login to travis
-command_docker = "docker exec travis-cli travis login --pro --github-token "
+command_docker = "docker exec travis-cli travis login --pro --org --github-token "
 command_docker += gh_token
 subprocess.run(command_docker, shell=True)
 
@@ -40,7 +40,6 @@ while (build_state != 'passed'):
     # Extract status and number of current build
     build_state = travis_show[1].split()[1]
     build_num = travis_show[0].split()[1].lstrip('#').rstrip(':')
-    print (build_num)
 
     # Extract info about jobs
     jobs = []
@@ -49,12 +48,12 @@ while (build_state != 'passed'):
             jobs.append(line)
 
     for job in jobs:
-        if any(status in job for status in ['failed:', 'errored:']):
+        if any(status in job for status in ['failed:', 'errored:', 'canceled:']):
             num = job.split()[0].split('.')[1]
             restart_job = 'docker exec travis-cli travis restart '
             restart_job += build_num + '.' + num
+            print ('Job ' + build_num + '.' + num + ' has failed. Restarting...')
             subprocess.run(restart_job, shell=True)
             
-            print (num)
-        
+       
         
