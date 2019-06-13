@@ -82,7 +82,7 @@ jobs:
           - docker version #Check Docker 18.09 is installed
 
           before_script:
-           - gzip -dc docker_cached/lamp-armhf.tar.gz | docker load
+          - gzip -dc docker_cached/lamp-armhf.tar.gz | docker load
           - sed -i "s,(install),install," etc/library.sh
 
           script: 
