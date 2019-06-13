@@ -26,4 +26,9 @@ sudo apt-get update -y
 
 sudo apt-get install docker-ce docker-ce-cli containerd.io -y
 
+sudo echo '{
+  "experimental": true,
+  "storage-driver": "overlay2"
+}' > /etc/docker/daemon.json
+
 sudo systemctl restart docker
