@@ -1,12 +1,22 @@
 #!/usr/bin/env python3
 
-import subprocess, re, os, signal
+### Usage: Before you run this daemon,
+### generate a token on Github page 
+### (https://github.com/settings/tokens) and
+### export it on host machine as an env var
+### named GITHUB_TOKEN as follows:
+### EXPORT GITHUB_TOKEN=<github token>
+### and then execute the script:
+### python restart_failed_jobs.py
+### It will return as soon as the build passes
+
+import subprocess, re, os, signal, sys
 
 # Signal handler for termination signals
 def termination_signal_handler(signalNumber, frame):
-    print ('Received:', signalNumber)
+    print ('\nReceived signal no ', signalNumber, '\nKilling travis-cli container...')
     docker_kill()
-    raise SystemExit ('Exiting gracefully...')
+    raise SystemExit (1)
     return
 
 signal.signal(signal.SIGTERM, termination_signal_handler)
@@ -18,17 +28,6 @@ def docker_kill():
     return
 
 def main():
-    # Static input
-    # Number of stages
-    stages = 4
-    # Total number of jobs
-    jobs = 9
-    # Number of jobs per stage
-    jobs_stage = []
-    jobs_stage.append(3)   # building_part1
-    jobs_stage.append(2)   # building_part2
-    jobs_stage.append(3)   # testing
-    jobs_stage.append(1)   # release
 
     # Travis cli configuration
 
@@ -87,6 +86,11 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except:
+    except (SystemExit):
+        print ('Exiting gracefully...')
+    else:
+        print ('Caught error. Killing travis-cli container...')
         docker_kill()
+        e = sys.exc_info()[0]
+        print('Error:', e)
         
