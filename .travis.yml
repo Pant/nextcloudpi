@@ -23,7 +23,7 @@ jobs:
           - docker version #Check Docker 18.09 is installed
 
           script:
-          - ./.travis/disable_install_subshell.sh
+          - sed -i "s,(install),install," etc/library.sh
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done & 
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-amd64:latest --pull --build-arg arch=amd64 --build-arg arch_qemu=x86_64 > output
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
@@ -45,7 +45,7 @@ jobs:
           - docker version #Check Docker 18.09 is installed
 
           script:      
-          - ./.travis/disable_install_subshell.sh
+          - sed -i "s,(install),install," etc/library.sh
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-armhf:latest --pull --build-arg arch=armhf --build-arg arch_qemu=arm > output
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
@@ -63,7 +63,7 @@ jobs:
           - docker version #Check Docker 18.09 is installed
 
           script:
-          - ./.travis/disable_install_subshell.sh
+          - sed -i "s,(install),install," etc/library.sh
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
           - DOCKER_BUILDKIT=1 docker build . -f docker/debian-ncp/Dockerfile -t ownyourbits/debian-ncp-arm64v8:latest --build-arg arch=arm64v8 --build-arg arch_qemu=aarch64 > output
           - sed -i "/innodb_file_format=barracuda/a open_files_limit=65536" lamp.sh
@@ -83,7 +83,7 @@ jobs:
 
           before_script:
            - gzip -dc docker_cached/lamp-armhf.tar.gz | docker load
-          - ./.travis/disable_install_subshell.sh
+          - sed -i "s,(install),install," etc/library.sh
 
           script: 
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
@@ -101,7 +101,7 @@ jobs:
 
           before_script:
           - gzip -dc docker_cached/lamp-arm64v8.tar.gz | docker load
-          - ./.travis/disable_install_subshell.sh
+          - sed -i "s,(install),install," etc/library.sh
 
           script: 
           - while sleep 9m; do echo "=====[ $SECONDS seconds, build-docker still building... ]====="; done &
