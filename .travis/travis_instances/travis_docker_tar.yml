@@ -8,6 +8,8 @@ dist: xenial
 branches:
   only:
         - gsoc2019-travis
+# Only build tags
+#if: tag IS present
 cache:
   directories:
         - docker_cached

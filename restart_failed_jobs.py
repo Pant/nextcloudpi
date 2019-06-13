@@ -57,6 +57,8 @@ def main():
         # Run travis show to get info about the build state and its jobs
         travis_show = subprocess.run("docker exec travis-cli travis show", shell=True, encoding='utf-8', stdout=subprocess.PIPE)
         travis_show = travis_show.stdout.split('\n')
+        
+        subprocess.run("sleep 5", shell=True)
 
         # Extract status and number of current build
         build_state = travis_show[1].split()[1]
